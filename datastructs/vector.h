@@ -1,5 +1,5 @@
 #pragma once
-#include "common.h"
+#include <stddef.h>
 
 template <typename T>
 class vector{
@@ -11,8 +11,10 @@ public:
   vector();
   ~vector();
   vector(size_t s);
+  T operator[](size_t i) const;
   T& operator[](size_t i);
   void reserve(size_t s);
+  void resize(size_t s);
   void push_back(const T& element);
   size_t size();
 };

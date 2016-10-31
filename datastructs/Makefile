@@ -1,20 +1,21 @@
 .DEFAULT_GOAL=all
-CC=g++
-CFLAGS=-c -Og -g -DDEBUG -Wall -std=gnu++11
-SRC=$(wildcard *.cpp)
-BUILD_DIR=build
-OBJ=$(addprefix $(BUILD_DIR)/, $(SRC:.cpp=.o))
-EXECUTABLE=$(BUILD_DIR)/datastructs
+CC = g++
+CFLAGS = -c -Og -g -DDEBUG -Wall -std=gnu++11
+SRC = $(wildcard *.cpp)
+BUILD_DIR = build
+OBJ = $(addprefix $(BUILD_DIR)/, $(SRC:.cpp=.o))
+EXECUTABLE = $(BUILD_DIR)/datastructs
+MAKEDEPEND = g++ -M $(CFLAGS) -o $*.Td $<
 
-all: $(EXECUTABLE)
-	@mkdir -p $(BUILD_DIR)
+all: dirs $(EXECUTABLE)
 
-# Automatic collection of Include Dependencies
-.PHONY: depend
-depend: dirs $(BUILD_DIR)/.depend
-	$(BUILD_DIR)/.depend: $(SRC)
-	rm -f $(BUILD_DIR)/.depend
-	$(CC) $(CFLAGS) -MM $^ -MF $(BUILD_DIR)/.depend;
+.PHONY: dirs
+dirs: $(BUILD_DIR)
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
+
+clean:
+	rm -rf $(BUILD_DIR)
 
 # The executable depends on all of the .o files
 $(EXECUTABLE): $(OBJ)
@@ -24,4 +25,9 @@ $(EXECUTABLE): $(OBJ)
 $(BUILD_DIR)/%.o: %.cpp
 	$(CC) $(CFLAGS) -o $@ $<
 
--include $(OBJ:.o=.d)
+%.d : %.cpp
+	$(MAKEDEPEND)
+	@sed 's/\($*\)\.o[ :]*/\1.o $@ : /g' < $*.Td > $@; \
+	  rm -f $*.Td; [ -s $@ ] || rm -f $@
+
+include $(SRCS:.cpp=.d)
