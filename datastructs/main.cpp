@@ -2,12 +2,19 @@
 #include "vector.h"
 
 int main(){
-  vector<int> vec(5, 4);
+  //This doesn't work:
+  //"Vector is implemented using internal pointers to the actual storage."
+  //You can't allocate contiguous memory for a resizable vector.
   
-  vec[0] = 3;
-  vec[1] = 2;
-  vec[3] = 1;
+  vector<vector<int> > vec(5, vector<int>(4,5));
   
-  for(size_t i = 0; i < vec.size(); i++)
-    std::cout << i << ": " << vec[i] << std::endl;
+  vec[0][0] = 3;
+  vec[1][1] = 2;
+  vec[3][3] = 1;
+  
+  for(size_t i = 0; i < vec.size(); i++){
+    for(size_t j = 0; j < vec.size(); j++)
+      std::cout << vec[i][j] << " ";
+    std::cout << std::endl;
+  }
 }
