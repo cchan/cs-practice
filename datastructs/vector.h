@@ -8,7 +8,7 @@ class vector{
 private:
   T* data;
   size_t data_size = 0;
-  size_t real_size = 0;
+  size_t reserved_size = 0;
   size_t ceil_pow_2(size_t) const;
 public:
   vector();
@@ -33,8 +33,10 @@ vector<T>::~vector(){
 
 template<typename T>
 size_t vector<T>::ceil_pow_2(size_t s) const{
-  size_t ceil = 2;
-  while (s & 1){
+  if(!s)return 0;
+  s--;
+  size_t ceil = 1;
+  while (s){
     s >>= 1;
     ceil <<= 1;
   }
@@ -44,14 +46,16 @@ size_t vector<T>::ceil_pow_2(size_t s) const{
 template <typename T>
 vector<T>::vector(size_t s){
   data_size = s;
-  real_size = ceil_pow_2(s);
+  reserved_size = ceil_pow_2(s);
+  for(int i = 0; i < 20; i++)
+    std::cout<<i << ": " << ceil_pow_2(i)<<std::endl;
   
-  std::cout << "data: " << data_size << " real: " << real_size << std::endl;
+  std::cout << "data: " << data_size << " real: " << reserved_size << std::endl;
   std::cout.flush();
   
   return;
   
-  data = (T*)calloc(real_size, sizeof (T)); //new T[s];
+  data = (T*)calloc(reserved_size, sizeof (T)); //new T[s];
   
   //initialize?
   
@@ -75,27 +79,27 @@ T& vector<T>::operator[](size_t i){
 
 template <typename T>
 void vector<T>::reserve(size_t s){
-  if (s > real_size){
+  if (s > reserved_size){
     data = (T*)realloc(data, s);
     if(data == nullptr)
       throw std::runtime_error("Failed to reallocate memory.");
-    real_size = s;
+    reserved_size = s;
   }
 }
 
 template <typename T>
 void vector<T>::resize(size_t s){
-  if (s > real_size){
+  if (s > reserved_size){
     data = (T*)realloc(data, s);
     if(data == nullptr)
       throw std::runtime_error("Failed to reallocate memory.");
-    real_size = s;
+    reserved_size = s;
   }
 }
 
 template <typename T>
 void vector<T>::push_back(const T& element){
-  if (data_size >= real_size)
+  if (data_size >= reserved_size)
     reserve(data_size * 2);
   data[data_size++] = element;
 }
