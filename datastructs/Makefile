@@ -1,35 +1,42 @@
+# Auto-dependency generation based on
+# http://make.mad-scientist.net/papers/advanced-auto-dependency-generation/
+
 .DEFAULT_GOAL=all
-CC = g++
-CFLAGS = -c -Og -g -DDEBUG -Wall -std=gnu++11
+
+CPP = g++
+CPPFLAGS = -Og -g -DDEBUG -Wall -pedantic -std=gnu++11
+LDFLAGS = 
 SRC = $(wildcard *.cpp)
-BUILD_DIR = build
-OBJ = $(addprefix $(BUILD_DIR)/, $(SRC:.cpp=.o))
-EXECUTABLE = $(BUILD_DIR)/datastructs
-MAKEDEPEND = g++ -M $(CFLAGS) -o $*.Td $<
+BUILDDIR = build
+OBJ = $(addprefix $(BUILDDIR)/, $(SRC:.cpp=.o))
+DEPDIR = $(BUILDDIR)/.depend
+DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.Td
+EXECUTABLE = $(BUILDDIR)/datastructs
+
+COMPILE.CPP = $(CPP) $(DEPFLAGS) $(CPPFLAGS) -c
+POSTCOMPILE = mv -f $(DEPDIR)/$*.Td $(DEPDIR)/$*.d
+
+$(shell mkdir -p $(BUILDDIR) >/dev/null)
+$(shell mkdir -p $(DEPDIR) >/dev/null)
 
 .PHONY: all
-all: dirs $(EXECUTABLE)
-
-.PHONY: dirs
-dirs: $(BUILD_DIR)
-$(BUILD_DIR):
-	mkdir -p $(BUILD_DIR)
+all: $(EXECUTABLE)
 
 .PHONY: clean
 clean:
-	rm -rf $(BUILD_DIR)
+	rm -rf $(BUILDDIR)
 
 # The executable depends on all of the .o files
 $(EXECUTABLE): $(OBJ)
-	$(CC) $(LDFLAGS) -o $@ $^
+	$(CPP) $(LDFLAGS) -o $@ $^
 
 # Each o file depends on its respective C++ file.
-$(BUILD_DIR)/%.o: %.cpp
-	$(CC) $(CFLAGS) -o $@ $<
+$(BUILDDIR)/%.o: %.cpp
+$(BUILDDIR)/%.o: %.cpp $(DEPDIR)/%.d
+	$(COMPILE.CPP) -o $@ $<
+	$(POSTCOMPILE)
 
-%.d : %.cpp
-	$(MAKEDEPEND)
-	@sed 's/\($*\)\.o[ :]*/\1.o $@ : /g' < $*.Td > $@; \
-	  rm -f $*.Td; [ -s $@ ] || rm -f $@
+$(DEPDIR)/%.d: ;
+.PRECIOUS: $(DEPDIR)/%.d
 
-include $(SRCS:.cpp=.d)
+-include $(patsubst %,$(DEPDIR)/%.d,$(basename $(SRCS)))
