@@ -3,6 +3,13 @@
 #include <stdexcept>
 #include <iostream>
 
+/*
+A vector implementation using C++ template features 
+as well as C-style realloc() et al.
+
+The usual amortized-constant-insertion kind of features.
+*/
+
 template <typename T>
 class vector{
 private:
@@ -13,7 +20,9 @@ private:
 public:
   vector();
   ~vector();
+  vector(const vector<T>&);
   vector(size_t);
+  vector(size_t, const T&);
   T operator[](size_t) const;
   T& operator[](size_t);
   void reserve(size_t);
@@ -21,15 +30,6 @@ public:
   void push_back(const T&);
   size_t size();
 };
-
-template <typename T>
-vector<T>::vector(){
-}
-
-template <typename T>
-vector<T>::~vector(){
-  free(data);
-}
 
 template<typename T>
 size_t vector<T>::ceil_pow_2(size_t s) const{
@@ -44,13 +44,48 @@ size_t vector<T>::ceil_pow_2(size_t s) const{
 }
 
 template <typename T>
+vector<T>::vector(){
+}
+
+template <typename T>
+vector<T>::~vector(){
+  for(size_t i = 0; i < data_size; i++)
+    data[i].~T();
+  free(data);
+}
+
+template <typename T>
+vector<T>::vector(const vector<T>& other){
+  data_size = other.data_size;
+  reserved_size = other.reserved_size;
+  data = (T*)malloc(reserved_size * sizeof (T));
+  for(size_t i = 0; i < data_size; i++)
+    data[i] = T();
+}
+
+template <typename T>
 vector<T>::vector(size_t s){
   data_size = s;
   reserved_size = ceil_pow_2(s);
   
-  data = (T*)calloc(reserved_size, sizeof (T)); //new T[s];
+  data = (T*)malloc(reserved_size * sizeof (T)); //new T[s];
   
-  //initialize?
+  for(size_t i = 0; i < s; i++)
+    data[i] = T();
+  
+  if(data == nullptr)
+    throw std::runtime_error("Failed to allocate memory");
+}
+
+template <typename T>
+vector<T>::vector(size_t s, const T& fill){
+  data_size = s;
+  reserved_size = ceil_pow_2(s);
+  
+  data = (T*)malloc(reserved_size * sizeof (T)); //new T[s];
+  
+  for(size_t i = 0; i < s; i++)
+    data[i] = T(fill);
   
   if(data == nullptr)
     throw std::runtime_error("Failed to allocate memory");
