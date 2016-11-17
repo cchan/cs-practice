@@ -39,4 +39,4 @@ $(BUILDDIR)/%.o: %.cpp $(DEPDIR)/%.d
 $(DEPDIR)/%.d: ;
 .PRECIOUS: $(DEPDIR)/%.d
 
--include $(patsubst %,$(DEPDIR)/%.d,$(basename $(SRCS)))
+-include $(patsubst %,$(DEPDIR)/%.d,$(basename $(SRC)))
