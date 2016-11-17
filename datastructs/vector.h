@@ -47,13 +47,6 @@ template <typename T>
 vector<T>::vector(size_t s){
   data_size = s;
   reserved_size = ceil_pow_2(s);
-  for(int i = 0; i < 20; i++)
-    std::cout<<i << ": " << ceil_pow_2(i)<<std::endl;
-  
-  std::cout << "data: " << data_size << " real: " << reserved_size << std::endl;
-  std::cout.flush();
-  
-  return;
   
   data = (T*)calloc(reserved_size, sizeof (T)); //new T[s];
   
