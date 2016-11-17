@@ -7,6 +7,7 @@ OBJ = $(addprefix $(BUILD_DIR)/, $(SRC:.cpp=.o))
 EXECUTABLE = $(BUILD_DIR)/datastructs
 MAKEDEPEND = g++ -M $(CFLAGS) -o $*.Td $<
 
+.PHONY: all
 all: dirs $(EXECUTABLE)
 
 .PHONY: dirs
@@ -14,6 +15,7 @@ dirs: $(BUILD_DIR)
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
+.PHONY: clean
 clean:
 	rm -rf $(BUILD_DIR)
 
