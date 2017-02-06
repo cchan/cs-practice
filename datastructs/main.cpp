@@ -6,9 +6,12 @@ int main(){
   //"Vector is implemented using internal pointers to the actual storage."
   //You can't allocate contiguous memory for a resizable vector.
   
-  vector<vector<int> > vec(5, vector<int>(4,5));
+  vector<int> tmp(5,10);
   
-  vec[0][0];
+  vector<vector<int> > vec(100);
+  
+  vec[0].push_back(3);
+  //vec[0][0];
   return 0;
   vec[1][1] = 2;
   vec[3][3] = 1;

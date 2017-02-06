@@ -16,8 +16,8 @@ private:
   T* data;
   size_t data_size = 0;
   size_t reserved_size = 0;
-  size_t ceil_pow_2(size_t) const;
 public:
+  static size_t ceil_pow_2(size_t);
   vector();
   ~vector();
   vector(const vector<T>&);
@@ -31,8 +31,13 @@ public:
   size_t size() const;
 };
 
+template <typename T>
+std::ostream& operator<<(std::ostream& out, const vector<T>& vec);
+
+
+
 template<typename T>
-size_t vector<T>::ceil_pow_2(size_t s) const{
+size_t vector<T>::ceil_pow_2(size_t s){
   if(!s)return 0;
   s--;
   size_t ceil = 1;
@@ -105,7 +110,6 @@ T vector<T>::operator[](size_t i) const{
 
 template <typename T>
 T& vector<T>::operator[](size_t i){
-  std::cout<<i<<' '<<data[0]<<std::endl;
   if(i >= data_size)
     throw std::range_error("Index out of range");
   return data[i];
@@ -114,27 +118,28 @@ T& vector<T>::operator[](size_t i){
 template <typename T>
 void vector<T>::reserve(size_t s){
   if (s > reserved_size){
-    data = (T*)realloc(data, s);
-    if(data == nullptr)
+    s = ceil_pow_2(s);
+    
+    T* new_data = (T*)realloc(data, s * sizeof (T));
+    
+    if(new_data == nullptr)
       throw std::runtime_error("Failed to reallocate memory.");
+    
+    data = new_data;
     reserved_size = s;
   }
 }
 
 template <typename T>
 void vector<T>::resize(size_t s){
-  if (s > reserved_size){
-    data = (T*)realloc(data, s);
-    if(data == nullptr)
-      throw std::runtime_error("Failed to reallocate memory.");
-    reserved_size = s;
-  }
+  reserve(s);
+  while(data_size < s)
+    data[data_size++] = T();
 }
 
 template <typename T>
 void vector<T>::push_back(const T& element){
-  if (data_size >= reserved_size)
-    reserve(data_size * 2);
+  reserve(data_size + 1);
   data[data_size++] = element;
 }
 
