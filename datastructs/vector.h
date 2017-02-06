@@ -28,7 +28,7 @@ public:
   void reserve(size_t);
   void resize(size_t);
   void push_back(const T&);
-  size_t size();
+  size_t size() const;
 };
 
 template<typename T>
@@ -58,9 +58,14 @@ template <typename T>
 vector<T>::vector(const vector<T>& other){
   data_size = other.data_size;
   reserved_size = other.reserved_size;
+  
   data = (T*)malloc(reserved_size * sizeof (T));
+  
+  if(data == nullptr)
+    throw std::runtime_error("Failed to allocate memory");
+  
   for(size_t i = 0; i < data_size; i++)
-    data[i] = T();
+    data[i] = T(other[i]);
 }
 
 template <typename T>
@@ -70,11 +75,11 @@ vector<T>::vector(size_t s){
   
   data = (T*)malloc(reserved_size * sizeof (T)); //new T[s];
   
-  for(size_t i = 0; i < s; i++)
-    data[i] = T();
-  
   if(data == nullptr)
     throw std::runtime_error("Failed to allocate memory");
+  
+  for(size_t i = 0; i < s; i++)
+    data[i] = T();
 }
 
 template <typename T>
@@ -84,11 +89,11 @@ vector<T>::vector(size_t s, const T& fill){
   
   data = (T*)malloc(reserved_size * sizeof (T)); //new T[s];
   
-  for(size_t i = 0; i < s; i++)
-    data[i] = T(fill);
-  
   if(data == nullptr)
     throw std::runtime_error("Failed to allocate memory");
+  
+  for(size_t i = 0; i < s; i++)
+    data[i] = T(fill);
 }
 
 template <typename T>
@@ -100,6 +105,7 @@ T vector<T>::operator[](size_t i) const{
 
 template <typename T>
 T& vector<T>::operator[](size_t i){
+  std::cout<<i<<' '<<data[0]<<std::endl;
   if(i >= data_size)
     throw std::range_error("Index out of range");
   return data[i];
@@ -133,6 +139,17 @@ void vector<T>::push_back(const T& element){
 }
 
 template <typename T>
-size_t vector<T>::size(){
+size_t vector<T>::size() const{
   return data_size;
+}
+
+template <typename T>
+std::ostream& operator<<(std::ostream& out, const vector<T>& vec){
+  out << '[';
+  if(vec[0])
+    out << vec[0];
+  for(size_t i = 1; i < vec.size(); i++)
+    out << ',' << vec[i];
+  out << ']';
+  return out;
 }

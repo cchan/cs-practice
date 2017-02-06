@@ -11,7 +11,7 @@ BUILDDIR = build
 OBJ = $(addprefix $(BUILDDIR)/, $(SRC:.cpp=.o))
 DEPDIR = $(BUILDDIR)/.depend
 DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.Td
-EXECUTABLE = $(BUILDDIR)/datastructs
+EXECUTABLE = $(BUILDDIR)/a
 
 COMPILE.CPP = $(CPP) $(DEPFLAGS) $(CPPFLAGS) -c
 POSTCOMPILE = mv -f $(DEPDIR)/$*.Td $(DEPDIR)/$*.d

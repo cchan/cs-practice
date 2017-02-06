@@ -8,7 +8,8 @@ int main(){
   
   vector<vector<int> > vec(5, vector<int>(4,5));
   
-  vec[0][0] = 3;
+  vec[0][0];
+  return 0;
   vec[1][1] = 2;
   vec[3][3] = 1;
   
